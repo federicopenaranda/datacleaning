@@ -1,2 +1,2 @@
 # datacleaning
-Web app to clean dat.
+Web app to clean data.
