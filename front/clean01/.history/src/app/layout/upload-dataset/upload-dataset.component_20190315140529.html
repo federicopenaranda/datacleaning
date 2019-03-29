@@ -1,0 +1,123 @@
+<div [@routerTransition]>
+  <app-page-header [heading]="'Forms'" [icon]="'fa-edit'"></app-page-header>
+
+  <div class="row">
+      <div class="col-lg-6">
+
+          <form role="form">
+
+              <fieldset class="form-group">
+                  <label for="exampleInputFile">File input</label>
+                  <input type="file" class="form-control-file" id="exampleInputFile">
+              </fieldset>
+
+              <button type="submit" class="btn btn-secondary">Submit Button</button>
+
+          </form>
+
+      </div>
+      <div class="col-lg-6">
+          <h4>Disabled Form States</h4>
+
+          <form role="form">
+
+              <fieldset disabled="">
+
+                  <div class="form-group">
+                      <label for="disabledSelect">Disabled input</label>
+                      <input class="form-control" id="disabledInput" type="text" placeholder="Disabled input" disabled="">
+                  </div>
+
+                  <div class="form-group">
+                      <label for="disabledSelect">Disabled select menu</label>
+                      <select id="disabledSelect" class="form-control">
+                          <option>Disabled select</option>
+                      </select>
+                  </div>
+
+                  <div class="checkbox">
+                      <label>
+                          <input type="checkbox"> Disabled Checkbox
+                      </label>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary">Disabled Button</button>
+
+              </fieldset>
+
+          </form>
+          <br>
+
+          <h4>Form Validation</h4>
+
+          <form role="form">
+
+              <div class="form-group">
+                  <label class="form-control-label" for="inputSuccess">Input with success</label>
+                  <input type="text" class="form-control is-valid" id="inputSuccess">
+                  <div class="valid-feedback">
+                    Input success message
+                  </div>
+              </div>
+
+              <div class="form-group">
+                  <label class="form-control-label" for="inputError">Input with danger</label>
+                  <input type="text" class="form-control is-invalid" id="inputError">
+                  <div class="invalid-feedback">
+                    Input error message
+                  </div>
+              </div>
+
+          </form>
+
+          <h4>Input Groups</h4>
+
+          <form role="form">
+
+              <div class="form-group input-group">
+                  <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">@</span>
+                  </div>
+                  <!-- <span class="input-group-addon">@</span> -->
+                  <input type="text" class="form-control" placeholder="Username">
+              </div>
+
+              <div class="form-group input-group">
+                  <input type="text" class="form-control">
+                  <div class="input-group-append">
+                      <span class="input-group-text">.00</span>
+                  </div>
+              </div>
+
+              <div class="form-group input-group">
+                  <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1"><i class="fa fa-eur"></i></span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="Font Awesome Icon">
+              </div>
+
+              <div class="form-group input-group">
+                  <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">$</span>
+                  </div>
+                  <input type="text" class="form-control">
+                  <div class="input-group-append">
+                      <span class="input-group-text">.00</span>
+                  </div>
+              </div>
+
+              <div class="form-group input-group">
+                  <input type="text" class="form-control">
+                  <div class="input-group-append">
+                      <button class="btn btn-secondary" type="button"><i class="fa fa-search"></i></button>
+                  </div>
+              </div>
+
+          </form>
+
+          <p>For complete documentation, please visit <a target="_blank" href="https://getbootstrap.com/docs/4.0/components/forms/">Bootstrap's Form Documentation</a>.</p>
+
+      </div>
+  </div>
+  <!-- /.row -->
+</div>

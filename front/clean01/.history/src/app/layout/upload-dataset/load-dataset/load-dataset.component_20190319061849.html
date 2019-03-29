@@ -1,0 +1,59 @@
+<div [@routerTransition]>
+  <app-page-header [heading]="'Load Dataset'" [icon]="'fa-table'"></app-page-header>
+  <div class="row">
+      <div class="col col-xl-12 col-lg-12">
+        <div class="card mb-3">
+          <div class="card-header">Available Datasets</div>
+          <div class="card-body table-responsive">
+              <table class="table table-bordered">
+                  <thead>
+                  <tr>
+                      <th>#</th>
+                      <th>File</th>
+                      <th>Date</th>
+                      <th>Load</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                      <th scope="row">1</th>
+                      <td>Mark</td>
+                      <td>Otto</td>
+                      <td>@mdo</td>
+                  </tr>
+                  <tr>
+                      <th scope="row">2</th>
+                      <td>Mark</td>
+                      <td>Otto</td>
+                      <td>@TwBootstrap</td>
+                  </tr>
+                  <tr>
+                      <th scope="row">3</th>
+                      <td>Jacob</td>
+                      <td>Thornton</td>
+                      <td>@fat</td>
+                  </tr>
+                  <tr>
+                      <th scope="row">4</th>
+                      <td colspan="2">Larry the Bird</td>
+                      <td>@twitter</td>
+                  </tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+
+<ng-template #loadingForm let-c="close" let-d="dismiss">
+  <div class="modal-content">
+      <div class="modal-body">
+          Uploading dataset, please wait ...
+          <div class="clearfix">
+            <!-- <ngb-progressbar type="info" [value]="uploadProgress"></ngb-progressbar> -->
+          </div>
+      </div>
+  </div>
+</ng-template>

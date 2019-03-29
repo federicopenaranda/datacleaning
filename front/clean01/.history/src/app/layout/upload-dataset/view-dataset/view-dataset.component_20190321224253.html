@@ -1,0 +1,65 @@
+<div [@routerTransition]>
+  <app-page-header [heading]="'View Dataset'" [icon]="'fa-table'"></app-page-header>
+
+
+        <div ngbDropdown class="d-inline-block dropdown">
+            <button class="btn btn-outline-primary" ngbDropdownToggle>Dataset Operations</button>
+            <div ngbDropdownMenu>
+                <button class="dropdown-item" (click)="onDatasetShape()">Shape</button>
+                <button class="dropdown-item">Another Action</button>
+                <button class="dropdown-item">Something else is here</button>
+            </div>
+        </div>
+        <div ngbDropdown class="d-inline-block dropdown">
+            <button class="btn btn-outline-primary" ngbDropdownToggle>Toggle dropdown</button>
+            <div ngbDropdownMenu>
+                <button class="dropdown-item">Action</button>
+                <button class="dropdown-item">Another Action</button>
+                <button class="dropdown-item">Something else is here</button>
+            </div>
+        </div>
+
+  
+  <div class="row">
+      <div class="col col-xl-12 col-lg-12">
+        <div class="card mb-3">
+          <div class="card-header">Dataset</div>
+          <div class="card-body table-responsive">
+              <table class="table table-sm table-striped">
+                  <thead>
+                    <tr>
+                        <th *ngFor="let c of columns; let i = index">{{ c }} 
+                            <div ngbDropdown class="d-inline-block dropdown">
+                                <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle><i class="fa fa-angle-down"></i></button>
+                                <div ngbDropdownMenu>
+                                    <button class="dropdown-item" (click)="onDeleteColumn(c)">Delete Column</button>
+                                    <button class="dropdown-item">Another Action</button>
+                                    <button class="dropdown-item">Something else is here</button>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let i of index">
+                        <td *ngFor="let field of data[i]">{{ field }}</td>
+                    </tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+
+<ng-template #loadingForm let-c="close" let-d="dismiss">
+  <div class="modal-content">
+      <div class="modal-body">
+          Uploading dataset, please wait ...
+          <div class="clearfix">
+            <!-- <ngb-progressbar type="info" [value]="uploadProgress"></ngb-progressbar> -->
+          </div>
+      </div>
+  </div>
+</ng-template>

@@ -1,0 +1,40 @@
+<div [@routerTransition]>
+  <app-page-header [heading]="'View Dataset'" [icon]="'fa-table'"></app-page-header>
+  
+  <div class="row">
+      <div class="col col-xl-12 col-lg-12">
+        <div class="card mb-3">
+          <div class="card-header">Dataset</div>
+          <div class="card-body table-responsive">
+              <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                        <th *ngFor="let c of columns">{{ c }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let d of data">
+                        <th scope="row">{{ d }}</th>
+                        <td></td>
+                        <td>9999-99-99</td>
+                        <td><button class="btn btn-success">Load</button></td>
+                    </tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+
+<ng-template #loadingForm let-c="close" let-d="dismiss">
+  <div class="modal-content">
+      <div class="modal-body">
+          Uploading dataset, please wait ...
+          <div class="clearfix">
+            <!-- <ngb-progressbar type="info" [value]="uploadProgress"></ngb-progressbar> -->
+          </div>
+      </div>
+  </div>
+</ng-template>

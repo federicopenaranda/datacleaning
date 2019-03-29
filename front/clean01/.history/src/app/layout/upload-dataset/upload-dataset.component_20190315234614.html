@@ -1,0 +1,22 @@
+<div [@routerTransition]>
+  <app-page-header [heading]="'Upload Dataset'" [icon]="'fa-edit'"></app-page-header>
+
+  <div class="row">
+      <div class="col-lg-6">
+
+          <form role="form">
+              <fieldset class="form-group">
+                  <label for="datasetFile">Select Dataset</label>
+                  <input type="file" (change)="onFileChanged($event)" class="form-control-file" id="datasetFile">
+              </fieldset>
+
+              <button 
+                type="submit" 
+                (click)="onUploadDataset(loadingForm)"
+                class="btn btn-secondary">Upload</button>
+          </form>
+
+      </div>
+    </div>
+  <!-- /.row -->
+</div>
