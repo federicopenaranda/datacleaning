@@ -144,7 +144,9 @@ def executeQuery( sql ):
         connection = mysql.connector.connect(host='localhost', database='clean01',  user='root',  password='')
 
         if connection.is_connected():
+            print ("Connected to MySQL")
             cursor = connection.cursor()
+            print(sql)
             cursor.execute( sql )
             connection.commit()
     except Error as e :

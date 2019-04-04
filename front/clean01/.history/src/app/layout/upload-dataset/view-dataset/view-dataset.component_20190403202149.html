@@ -9,6 +9,9 @@
                     <button class="dropdown-item" (click)="onDatasetShape(datasetShapeModal)">Dataset Info</button>
                 </div>
             </div>
+            <div class="text-right">
+                <button type="button" class="btn btn-primary">Apply Operations</button>
+            </div>
             <!-- <div ngbDropdown class="d-inline-block dropdown">
                 <button class="btn btn-outline-primary" ngbDropdownToggle>Toggle dropdown</button>
                 <div ngbDropdownMenu>
@@ -21,8 +24,16 @@
 
         <div class="col col-xl-2 col-lg-2" style="margin-bottom: 1rem">
             <div class="text-right">
-                <button type="button" class="btn btn-success" [disabled]="operations.length == 0">Apply Operations</button>
+                <button type="button" class="btn btn-primary">Apply Operations</button>
             </div>
+            <!-- <div ngbDropdown class="d-inline-block dropdown">
+                <button class="btn btn-outline-primary" ngbDropdownToggle>Toggle dropdown</button>
+                <div ngbDropdownMenu>
+                    <button class="dropdown-item">Action</button>
+                    <button class="dropdown-item">Another Action</button>
+                    <button class="dropdown-item">Something else is here</button>
+                </div>
+            </div> -->
         </div>
     </div>
 

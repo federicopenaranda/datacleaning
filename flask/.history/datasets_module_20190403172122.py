@@ -16,7 +16,8 @@ def loadDataset(request):
 
     if data['params']['dataset'] != None:
         file = r'C:\\courses\\clean01\\datacleaning\\back\\clean01\\public\\datasets\\' + data['params']['dataset']
-        dataset = pd.read_csv(file, error_bad_lines=False, warn_bad_lines=True)
+        dataset = pd.read_csv(file)
+        # dataset = pd.read_csv(file, error_bad_lines=False, warn_bad_lines=True)
 
     ram, rows, cols = getOperationMetadata()
 
@@ -144,9 +145,12 @@ def executeQuery( sql ):
         connection = mysql.connector.connect(host='localhost', database='clean01',  user='root',  password='')
 
         if connection.is_connected():
+            print ("Connected to MySQL")
             cursor = connection.cursor()
-            cursor.execute( sql )
-            connection.commit()
+            print(sql)
+            res = cursor.execute( sql )
+            print('res -->')
+            print(res)
     except Error as e :
         print ("Error while connecting to MySQL", e)
     finally:

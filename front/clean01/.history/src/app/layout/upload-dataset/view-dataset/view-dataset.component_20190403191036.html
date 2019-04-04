@@ -2,7 +2,7 @@
     <app-page-header [heading]="'View Dataset'" [icon]="'fa-table'"></app-page-header>
 
     <div class="row">
-        <div class="col col-xl-10 col-lg-10" style="margin-bottom: 1rem">
+        <div class="col col-xl-12 col-lg-12" style="margin-bottom: 1rem">
             <div ngbDropdown class="d-inline-block dropdown">
                 <button class="btn btn-outline-primary" ngbDropdownToggle>Dataset Operations</button>
                 <div ngbDropdownMenu>
@@ -17,12 +17,6 @@
                     <button class="dropdown-item">Something else is here</button>
                 </div>
             </div> -->
-        </div>
-
-        <div class="col col-xl-2 col-lg-2" style="margin-bottom: 1rem">
-            <div class="text-right">
-                <button type="button" class="btn btn-success" [disabled]="operations.length == 0">Apply Operations</button>
-            </div>
         </div>
     </div>
 
@@ -92,8 +86,7 @@
                         <div class="row">
                             <div class="col-sm">
                                 <div class="list-group">
-                                    <a href="javascript:void(0)" class="list-group-item active" (click)="onFillSpecificValue(specificValueModal)">
-                                        Fill with specific value <span style="font-weight: bolder" *ngIf="specificDate.year !== ''"> --> {{ specificDate.year + '-' + specificDate.month + '-' + specificDate.day }}</span></a>
+                                    <a href="javascript:void(0)" class="list-group-item active" (click)="onFillSpecificValue(specificValueModal)">Fill with specific value <span style="font-weight: bolder" *ngIf="specificDate.year !== ''"> --> {{ specificDate.year + '-' + specificDate.month + '-' + specificDate.day }}</span></a>
                                 </div>
                             </div>
                             <!-- /.col-sm-4 -->
@@ -110,7 +103,6 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="saveOperations()">Save Operations</button>
         <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
     </div>
 </ng-template>
@@ -124,118 +116,122 @@
         </button>
     </div>
     <div class="modal-body">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="panel-body">
-                        <ngb-tabset>
-                            <ngb-tab>
-                                <ng-template ngbTabTitle>Shape</ng-template>
-                                <ng-template ngbTabContent>
-                                    <div class="row">
-                                        <div class="col-sm">
-                                            <div class="table-responsive">
-                                                <table class="table table-sm table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Info</th>
-                                                            <!-- <th>First Name</th>
-                                                            <th>Last Name</th>
-                                                            <th>Username</th> -->
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr *ngFor="let d of datasetShape">
-                                                            <td>{{ d }}</td>
-                                                            <!-- <td>Mark</td>
-                                                            <td>Otto</td>
-                                                            <td>@mdo</td> -->
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <!-- /.col-sm-4 -->
-                                    </div>
-                                </ng-template>
-                            </ngb-tab>
-                            <ngb-tab>
-                                <ng-template ngbTabTitle>Description</ng-template>
-                                <ng-template ngbTabContent>
-                                    <div class="row">
-                                        <div class="col-sm">
-                                            <div class="table-responsive">
-                                                <table class="table table-sm table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Feature</th>
-                                                            <th>25%</th>
-                                                            <th>50%</th>
-                                                            <th>75%</th>
-                                                            <th>Count</th>
-                                                            <th>Freq.</th>
-                                                            <th>Max</th>
-                                                            <th>Mean</th>
-                                                            <th>Min</th>
-                                                            <th>STD</th>
-                                                            <th>Top</th>
-                                                            <th>Unique</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr *ngFor="let i of datasetDescription; let i2 = index">
-                                                            <td>{{ columns[i2] }}</td>
-                                                            <td>{{ i['25%'] }}</td>
-                                                            <td>{{ i['50%'] }}</td>
-                                                            <td>{{ i['75%'] }}</td>
-                                                            <td>{{ i['count'] }}</td>
-                                                            <td>{{ i['freq'] }}</td>
-                                                            <td>{{ i['max'] | number }}</td>
-                                                            <td>{{ i['mean'] | number }}</td>
-                                                            <td>{{ i['min'] | number }}</td>
-                                                            <td>{{ i['std'] | number }}</td>
-                                                            <td>{{ i['top'] }}</td>
-                                                            <td>{{ i['unique'] }}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </ng-template>
-                            </ngb-tab>
 
-                            <ngb-tab>
-                                <ng-template ngbTabTitle>Missing</ng-template>
-                                <ng-template ngbTabContent>
-                                    <div class="row">
-                                        <div class="col-sm">
-                                            <div class="table-responsive">
-                                                <table class="table table-sm table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Column</th>
-                                                            <th>Missing</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr *ngFor="let c of columns">
-                                                            <td>{{ c }}</td>
-                                                            <td>{{ datasetMissing[c] }}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel-body">
+                            <ngb-tabset>
+                                <ngb-tab>
+                                    <ng-template ngbTabTitle>Shape</ng-template>
+                                    <ng-template ngbTabContent>
+                                        <div class="row">
+                                            <div class="col-sm">
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Info</th>
+                                                                <!-- <th>First Name</th>
+                                                                <th>Last Name</th>
+                                                                <th>Username</th> -->
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let d of datasetShape">
+                                                                <td>{{ d }}</td>
+                                                                <!-- <td>Mark</td>
+                                                                <td>Otto</td>
+                                                                <td>@mdo</td> -->
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <!-- /.col-sm-4 -->
+                                        </div>
+                                    </ng-template>
+                                </ngb-tab>
+                                <ngb-tab>
+                                    <ng-template ngbTabTitle>Description</ng-template>
+                                    <ng-template ngbTabContent>
+                                        <div class="row">
+                                            <div class="col-sm">
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Feature</th>
+                                                                <th>25%</th>
+                                                                <th>50%</th>
+                                                                <th>75%</th>
+                                                                <th>Count</th>
+                                                                <th>Freq.</th>
+                                                                <th>Max</th>
+                                                                <th>Mean</th>
+                                                                <th>Min</th>
+                                                                <th>STD</th>
+                                                                <th>Top</th>
+                                                                <th>Unique</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let i of datasetDescription; let i2 = index">
+                                                                <td>{{ columns[i2] }}</td>
+                                                                <td>{{ i['25%'] }}</td>
+                                                                <td>{{ i['50%'] }}</td>
+                                                                <td>{{ i['75%'] }}</td>
+                                                                <td>{{ i['count'] }}</td>
+                                                                <td>{{ i['freq'] }}</td>
+                                                                <td>{{ i['max'] | number }}</td>
+                                                                <td>{{ i['mean'] | number }}</td>
+                                                                <td>{{ i['min'] | number }}</td>
+                                                                <td>{{ i['std'] | number }}</td>
+                                                                <td>{{ i['top'] }}</td>
+                                                                <td>{{ i['unique'] }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </ng-template>
-                            </ngb-tab>
+                                    </ng-template>
+                                </ngb-tab>
 
-                        </ngb-tabset>
+                                <ngb-tab>
+                                    <ng-template ngbTabTitle>Missing</ng-template>
+                                    <ng-template ngbTabContent>
+                                        <div class="row">
+                                            <div class="col-sm">
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Column</th>
+                                                                <th>Missing</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let c of columns">
+                                                                <td>{{ c }}</td>
+                                                                <td>{{ datasetMissing[c] }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ng-template>
+                                </ngb-tab>
+
+                            </ngb-tabset>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>

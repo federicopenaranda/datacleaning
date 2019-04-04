@@ -135,7 +135,6 @@ def getOperationMetadata():
 
 
 def executeQuery( sql ):
-    print('executeQuery')
     # MySQL Connection
     import mysql.connector
     from mysql.connector import Error
@@ -144,9 +143,12 @@ def executeQuery( sql ):
         connection = mysql.connector.connect(host='localhost', database='clean01',  user='root',  password='')
 
         if connection.is_connected():
+            print ("Connected to MySQL")
             cursor = connection.cursor()
-            cursor.execute( sql )
-            connection.commit()
+            print(sql)
+            res = cursor.execute( sql )
+            print('res -->')
+            print(res)
     except Error as e :
         print ("Error while connecting to MySQL", e)
     finally:

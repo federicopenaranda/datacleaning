@@ -168,7 +168,7 @@ export class ViewDatasetComponent implements OnInit {
 
 
   saveOperations() {
-    this.columnOperationsModal.close();
+    this.
   }
 
 

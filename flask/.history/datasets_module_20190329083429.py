@@ -15,28 +15,28 @@ def loadDataset(request):
     data = request.get_json()
 
     if data['params']['dataset'] != None:
-        file = r'C:\\courses\\clean01\\datacleaning\\back\\clean01\\public\\datasets\\' + data['params']['dataset']
+        file = r'C:\\courses\\DataCleaning\\back\\clean01\\public\\datasets\\' + data['params']['dataset']
         dataset = pd.read_csv(file, error_bad_lines=False, warn_bad_lines=True)
 
     ram, rows, cols = getOperationMetadata()
 
     end = time.time()
 
-    # print( 'Execution Time: ' )
-    # print( round(end - start, 4) )
+    print( 'Execution Time: ' )
+    print( round(end - start, 4) )
 
-    # print( 'RAM Used (MB): ' )
-    # print( ram )
+    print( 'RAM Used (MB): ' )
+    print( ram )
 
-    # print( 'Total Rows: ' )
-    # print( rows )
+    print( 'Total Rows: ' )
+    print( rows )
 
-    # print( 'Total Cols: ' )
-    # print( cols )
+    print( 'Total Cols: ' )
+    print( cols )
 
-    query = "INSERT INTO `operation_log` VALUES (NULL, '" + str( round(end - start, 4) ) + "', '"+ data['params']['dataset'] +"', 'loadDataset', 'finished', '"+ str( ram ) +"', '"+ str( cols ) +"', '"+ str( rows ) +"');"
-    # print (query)
-    executeQuery(query)
+    query = "INSERT INTO `operation_log` VALUES (NULL, '" + str( round(end - start, 4) ), "', 'iris.csv', 'view', 'finished', '4.5556', '6', '150');"
+
+    executeQuery()
 
     return ''
 
@@ -135,7 +135,6 @@ def getOperationMetadata():
 
 
 def executeQuery( sql ):
-    print('executeQuery')
     # MySQL Connection
     import mysql.connector
     from mysql.connector import Error
@@ -144,9 +143,9 @@ def executeQuery( sql ):
         connection = mysql.connector.connect(host='localhost', database='clean01',  user='root',  password='')
 
         if connection.is_connected():
+            print ("Connected to MySQL")
             cursor = connection.cursor()
             cursor.execute( sql )
-            connection.commit()
     except Error as e :
         print ("Error while connecting to MySQL", e)
     finally:

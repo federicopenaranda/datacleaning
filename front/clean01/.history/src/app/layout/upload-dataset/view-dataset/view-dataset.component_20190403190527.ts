@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { routerTransition } from '../../../router.animations';
 import { LoadDatasetService } from '../../shared/load-dataset.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Operation } from '../shared/operation.model';
 
 @Component({
   selector: 'app-view-dataset',
@@ -29,16 +28,8 @@ export class ViewDatasetComponent implements OnInit {
 
   public cleaningActions: Array<any> = [];
 
-  public specificDate: any = {
-    year: '',
-    month: '',
-    day: ''
-  }
+  public specificDate: any;
   public specificDateModal: any;
-
-  public operations: Array<Operation> = [];
-
-  public columnOperationsModal: any;
 
 
   constructor( private viewDatasetService: LoadDatasetService,
@@ -107,7 +98,7 @@ export class ViewDatasetComponent implements OnInit {
 
   onOtherColumnActions(columnOperationsModal, column) {
     this.selectedColumn = column;
-    this.columnOperationsModal = this.modalService.open(columnOperationsModal, { size: 'lg', backdrop: 'static' });
+    this.modalService.open(columnOperationsModal, { size: 'lg', backdrop: 'static' });
   }
 
 
@@ -144,31 +135,14 @@ export class ViewDatasetComponent implements OnInit {
 
 
   onSaveSpecificValue(date: any) {
-    if ( this.operations.length === 0 )
-    {
-      let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, this.specificDate);
-      this.operations.push(op1);
-    }
-    else
-    {
-      for (var i=0; i < this.operations.length; i++) {
-        if (this.operations[i].operation_type === 'filling_blank' && this.operations[i].operation_column === this.selectedColumn) {
-          this.operations[i].operation_value = this.specificDate;
-        }
-      }
+    console.log(date);
 
-      this.specificDateModal.close();
-    }
   }
 
 
   onSelectSpecificDate(date) {
+    console.log(date);
     this.specificDate = date;
-  }
-
-
-  saveOperations() {
-    this.columnOperationsModal.close();
   }
 
 

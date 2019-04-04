@@ -144,9 +144,16 @@ def executeQuery( sql ):
         connection = mysql.connector.connect(host='localhost', database='clean01',  user='root',  password='')
 
         if connection.is_connected():
+            print ("Connected to MySQL")
             cursor = connection.cursor()
-            cursor.execute( sql )
+            print(sql)
+            res = cursor.execute( sql )
             connection.commit()
+            
+            for rslt in cursor.execute('SELECT * FROM `operation_log`', multi=True):
+                print('res -->')
+                print(rslt.fetchone())
+            # print(res)
     except Error as e :
         print ("Error while connecting to MySQL", e)
     finally:

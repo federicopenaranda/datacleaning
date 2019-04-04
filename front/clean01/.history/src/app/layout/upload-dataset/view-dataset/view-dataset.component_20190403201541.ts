@@ -38,8 +38,6 @@ export class ViewDatasetComponent implements OnInit {
 
   public operations: Array<Operation> = [];
 
-  public columnOperationsModal: any;
-
 
   constructor( private viewDatasetService: LoadDatasetService,
                 private modalService: NgbModal ) { }
@@ -107,7 +105,7 @@ export class ViewDatasetComponent implements OnInit {
 
   onOtherColumnActions(columnOperationsModal, column) {
     this.selectedColumn = column;
-    this.columnOperationsModal = this.modalService.open(columnOperationsModal, { size: 'lg', backdrop: 'static' });
+    this.modalService.open(columnOperationsModal, { size: 'lg', backdrop: 'static' });
   }
 
 
@@ -168,7 +166,7 @@ export class ViewDatasetComponent implements OnInit {
 
 
   saveOperations() {
-    this.columnOperationsModal.close();
+
   }
 
 
