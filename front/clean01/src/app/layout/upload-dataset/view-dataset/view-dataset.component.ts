@@ -34,11 +34,16 @@ export class ViewDatasetComponent implements OnInit {
     month: '',
     day: ''
   }
+
+  public specificValue: any = '';
+
   public specificDateModal: any;
 
-  public operations: Array<Operation> = [];
+  public operations: any = {};
 
   public columnOperationsModal: any;
+
+  public viewOperations: Array<any> = [];
 
 
   constructor( private viewDatasetService: LoadDatasetService,
@@ -46,6 +51,15 @@ export class ViewDatasetComponent implements OnInit {
 
   ngOnInit() {
     this.onViewDataset();
+
+    if ( this.operations.length > 0 )
+    {
+      for (var i=0; i < this.operations.length; i++) {
+        if (this.operations[i].operation_type === 'filling_blank' && this.operations[i].operation_column === this.selectedColumn) {
+          this.specificValue = this.operations[i].operation_value;
+        }
+      }
+    }
   }
 
 
@@ -64,16 +78,29 @@ export class ViewDatasetComponent implements OnInit {
   }
 
 
-  onDeleteColumn( column_name: string ) {
-    this.viewDatasetService.deleteColumn(column_name).subscribe(
-      (data: any) => {
-        this.data = data.data;
-        this.columns = data.columns;
-        this.index = data.index;
-      },
-      (error) => console.log(error),
-      () => console.log('Delete Column Finished!')
-    );
+  onDeleteColumn() {
+    if ( !this.operations[this.selectedColumn] )
+    {
+      this.operations[this.selectedColumn] = [];
+      let op1 = new Operation('delete_column', this.dataset, this.selectedColumn, this.selectedColumn, 'new');
+      this.operations[this.selectedColumn].push(op1);
+    }
+    else
+    {
+      let flag = false;
+      for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
+        if (this.operations[this.selectedColumn][i].operation_type === 'delete_column') {
+          this.operations[this.selectedColumn][i].operation_value = this.selectedColumn;
+          flag = true;
+        }
+      }
+
+      if ( !flag )
+      {
+        let op1 = new Operation('delete_column', this.dataset, this.selectedColumn, this.selectedColumn, 'new');
+        this.operations[this.selectedColumn].push(op1);
+      }
+    }
   }
 
   
@@ -108,6 +135,18 @@ export class ViewDatasetComponent implements OnInit {
   onOtherColumnActions(columnOperationsModal, column) {
     this.selectedColumn = column;
     this.columnOperationsModal = this.modalService.open(columnOperationsModal, { size: 'lg', backdrop: 'static' });
+
+    if ( this.operations[this.selectedColumn] )
+    {
+      for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
+        if (this.operations[this.selectedColumn][i].operation_type === 'filling_blank') {
+          this.specificValue = this.operations[this.selectedColumn][i].operation_value.year + '-' + this.operations[this.selectedColumn][i].operation_value.month + '-' + this.operations[this.selectedColumn][i].operation_value.day;
+          return;
+        }
+      }
+    }
+    
+    this.specificValue = '';
   }
 
 
@@ -127,43 +166,81 @@ export class ViewDatasetComponent implements OnInit {
 
 
   onChangeToDate() {
-    this.viewDatasetService.changeColumnToDate(this.selectedColumn).subscribe(
-      (data: any) => {
-        console.log(data);
-        this.onViewDataset();
-      },
-      (error) => console.log(error),
-      () => console.log('Change Column to Date Finished...')
-    );
+    if ( !this.operations[this.selectedColumn] )
+    {
+      this.operations[this.selectedColumn] = [];
+      let op1 = new Operation('change_data_type', this.dataset, this.selectedColumn, 'date', 'new');
+      this.operations[this.selectedColumn].push(op1);
+    }
+    else
+    {
+      let flag = false;
+      for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
+        if (this.operations[this.selectedColumn][i].operation_type === 'change_data_type') {
+          this.operations[this.selectedColumn][i].operation_value = 'date';
+          flag = true;
+        }
+      }
+
+      if ( !flag )
+      {
+        let op1 = new Operation('change_data_type', this.dataset, this.selectedColumn, 'date', 'new');
+        this.operations[this.selectedColumn].push(op1);
+      }
+    }
   }
 
 
   onFillSpecificValue(specificValueModal) {
+    if ( this.operations[this.selectedColumn] )
+    {
+      for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
+        if (this.operations[this.selectedColumn][i].operation_type === 'filling_blank') {
+          this.specificValue = this.operations[this.selectedColumn][i].operation_value.year + '-' + this.operations[this.selectedColumn][i].operation_value.month + '-' + this.operations[this.selectedColumn][i].operation_value.day;
+          this.specificDateModal = this.modalService.open(specificValueModal, { size: 'lg', backdrop: 'static' });
+          return;
+        }
+      }
+    }
+    
+    this.specificValue = '';
     this.specificDateModal = this.modalService.open(specificValueModal, { size: 'lg', backdrop: 'static' });
   }
 
 
   onSaveSpecificValue(date: any) {
-    if ( this.operations.length === 0 )
-    {
-      let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, this.specificDate);
-      this.operations.push(op1);
-    }
-    else
-    {
-      for (var i=0; i < this.operations.length; i++) {
-        if (this.operations[i].operation_type === 'filling_blank' && this.operations[i].operation_column === this.selectedColumn) {
-          this.operations[i].operation_value = this.specificDate;
-        }
-      }
-
-      this.specificDateModal.close();
-    }
+    this.specificDateModal.close();
   }
 
 
-  onSelectSpecificDate(date) {
-    this.specificDate = date;
+  onSelectSpecificDate(date: any) {
+    if ( !this.operations[this.selectedColumn] )
+    {
+      this.operations[this.selectedColumn] = [];
+      let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, date, 'new');
+      this.operations[this.selectedColumn].push(op1);
+      this.specificValue = date.year + '-' + date.month + '-' + date.day;
+    }
+    else
+    {
+      let flag = false;
+      for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
+        if (this.operations[this.selectedColumn][i].operation_type === 'filling_blank') {
+          this.operations[this.selectedColumn][i].operation_value = date;
+          this.specificValue = date.year + '-' + date.month + '-' + date.day;
+          flag = true;
+        }
+      }
+
+      if ( !flag )
+      {
+        let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, date, 'new');
+        this.operations[this.selectedColumn].push(op1);
+        this.specificValue = date.year + '-' + date.month + '-' + date.day;
+      }
+    }
+
+    console.log(this.operations);
   }
 
 
@@ -171,5 +248,72 @@ export class ViewDatasetComponent implements OnInit {
     this.columnOperationsModal.close();
   }
 
+
+  onApplyOperations() {
+    this.viewDatasetService.applyOperations( this.operations ).subscribe(
+      (data: any) => {
+        for (let col in this.operations) {
+          for ( let i=0; i<this.operations[col].length; i++ )
+          {
+            if ( this.operations[col][i]['operation_status'] == 'new' )
+              this.operations[col][i]['operation_status'] = 'applied';
+          }
+        }
+
+        this.onViewDataset();
+      },
+      (error) => console.log(error),
+      () => console.log('Operations Applied...')
+    );
+  }
+
+
+  onViewOperations(viewOperationsModal) {
+    this.modalService.open(viewOperationsModal, { size: 'lg', backdrop: 'static' });
+    this.buildViewOperations();
+  }
+
+
+  buildViewOperations() {
+    this.viewOperations = [];
+
+    for ( let oo in this.operations )
+    {
+      this.viewOperations.push(...this.operations[oo]);
+    }
+  }
+
+
+  isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+  }
+
+  isDate(val) {
+    return ( val.constructor.name === 'NgbDate' ) ? true : false;
+  }
+
+
+  applySingleOperation(op) {
+    console.log(op);
+  }
+  
+  deleteSingleOperation(op) {
+    for ( let oo in this.operations )
+    {
+      for ( let i=0; i<this.operations[oo].length; i++)
+      {
+        if ( this.operations[oo][i] == op )
+        {
+          this.operations[oo].splice(i, 1);
+        }
+      }
+    }
+
+    this.buildViewOperations();
+  }
 
 }

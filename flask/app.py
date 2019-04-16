@@ -17,6 +17,7 @@ cors = CORS(app, supports_credentials=True)
 
 # Global dataset variable
 dataset = ''
+datasetFile = ''
 
 
 @app.route('/')
@@ -43,14 +44,19 @@ def shape_dataset():
     return infoDataset(request)
 
 
-@app.route('/delete_column', methods=['POST'])
-def delete_column():
-    return deleteColumn(request)
+# @app.route('/delete_column', methods=['POST'])
+# def delete_column():
+#     return deleteColumn(request)
 
 
-@app.route('/change_column_to_date', methods=['POST'])
-def change_column_to_date():
-    return changeColumnToDate(request)
+# @app.route('/change_column_to_date', methods=['POST'])
+# def change_column_to_date():
+#     return changeColumnToDate(request)
+
+
+@app.route('/apply_operations', methods=['POST'])
+def apply_operations():
+    return applyOperations(request)
 
 
 

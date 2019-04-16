@@ -21,7 +21,19 @@
 
         <div class="col col-xl-2 col-lg-2" style="margin-bottom: 1rem">
             <div class="text-right">
-                <button type="button" class="btn btn-success" [disabled]="operations.length == 0">Apply Operations</button>
+                <div ngbDropdown class="d-inline-block dropdown" placement="bottom-right">
+                    <button class="btn btn-outline-success" ngbDropdownToggle>Operations</button>
+                    <div ngbDropdownMenu>
+                        <!-- [disabled]="isEmpty(operations)"  -->
+                        <button 
+                            class="dropdown-item btn btn-outline-success" 
+                            (click)="onApplyOperations()">Apply All Operations</button>
+                        <!-- [disabled]="isEmpty(operations)"  -->
+                        <button 
+                            class="dropdown-item btn btn-outline-success" 
+                            (click)="onViewOperations(viewOperationsModal)">View Operations</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -41,7 +53,6 @@
                                         </button>
                                         <div ngbDropdownMenu>
                                             <button class="dropdown-item" (click)="onInfoColumn(columnDescModal, c)">Column Info</button>
-                                            <button class="dropdown-item" (click)="onDeleteColumn(c)">Delete Column</button>
                                             <button class="dropdown-item" (click)="onOtherColumnActions(columnOperationsModal, c)">Other Actions</button>
                                         </div>
                                     </div>
@@ -93,7 +104,7 @@
                             <div class="col-sm">
                                 <div class="list-group">
                                     <a href="javascript:void(0)" class="list-group-item active" (click)="onFillSpecificValue(specificValueModal)">
-                                        Fill with specific value <span style="font-weight: bolder" *ngIf="specificDate.year !== ''"> --> {{ specificDate.year + '-' + specificDate.month + '-' + specificDate.day }}</span></a>
+                                        Fill with specific value <span style="font-weight: bolder"> {{ specificValue }}</span></a>
                                 </div>
                             </div>
                             <!-- /.col-sm-4 -->
@@ -103,7 +114,15 @@
                 <ngb-tab>
                     <ng-template ngbTabTitle>Others</ng-template>
                     <ng-template ngbTabContent>
-                        <p></p>
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="list-group">
+                                    <a href="javascript:void(0)" class="list-group-item active" (click)="onDeleteColumn()">
+                                        Delete Column </a>
+                                </div>
+                            </div>
+                            <!-- /.col-sm-4 -->
+                        </div>
                     </ng-template>
                 </ngb-tab>
             </ngb-tabset>
@@ -383,6 +402,68 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="onSaveSpecificValue(d)">Save</button>
+        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>
+
+
+<ng-template #viewOperationsModal let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Operations</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel-body">
+
+
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Operation Type</th>
+                                        <th>Value</th>
+                                        <th style="width: 10%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let op of viewOperations">
+                                        <td>{{ op.operation_type }}</td>
+                                        <td *ngIf="isDate(op.operation_value)">{{ op.operation_value.year + '-' + op.operation_value.month + '-' + op.operation_value.day }}</td>
+                                        <td *ngIf="!isDate(op.operation_value)">{{ op.operation_value }}</td>
+                                        <td>
+                                            <button 
+                                                (click)="applySingleOperation(op)"
+                                                [disabled]="op.operation_status === 'applied'"
+                                                class="btn btn-sm btn-success" 
+                                                type="button" 
+                                                style="margin-right: 4px">
+                                                <i class="fa fa-bolt" alt="Apply Operation" ></i>
+                                            </button>
+                                            <button 
+                                                (click)="deleteSingleOperation(op)"
+                                                [disabled]="op.operation_status === 'applied'"
+                                                class="btn btn-sm btn-danger" 
+                                                type="button">
+                                                <i class="fa fa-trash" alt="Delete Operation"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-primary" (click)="onSaveSpecificValue(d)">Save</button> -->
         <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
     </div>
 </ng-template>

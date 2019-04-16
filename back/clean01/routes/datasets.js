@@ -26,8 +26,11 @@ router.get('/dataset_list', async (req, res, next) => {
 
   let datasetResponse = [];
 
+  console.log(datasetFolder);
+
   fs.readdir(datasetFolder, async (err, files) => {
     files.forEach( (file) => {
+      console.log(file);
       let fileData = { name: file, date: '' };
       datasetResponse.push(fileData);
     });

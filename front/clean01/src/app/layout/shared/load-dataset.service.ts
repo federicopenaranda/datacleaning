@@ -19,11 +19,13 @@ export class LoadDatasetService {
 
   constructor( private http: HttpClient ) { }
 
+
   public getDatasets() {
     return this.http.get( 'http://localhost:3000/datasets/dataset_list', {
       withCredentials: true
     });
   }
+
 
   public loadDataset( dataset: string ) {
     return this.http.post( 'http://localhost:5000/load_dataset', {
@@ -33,6 +35,7 @@ export class LoadDatasetService {
     }, this.httpOptions);
   }
 
+
   public viewDataset( dataset: string ) {
     return this.http.post( 'http://localhost:5000/view_dataset', {
       params: {
@@ -41,17 +44,11 @@ export class LoadDatasetService {
     }, this.httpOptions);
   }
 
+
   public shapeDataset() {
     return this.http.get( 'http://localhost:5000/shape_dataset');
   }
 
-  public deleteColumn( column: string ) {
-    return this.http.post( 'http://localhost:5000/delete_column', {
-      params: {
-        'column': column
-      }
-    }, this.httpOptions);
-  }
 
   public infoColumn( column: string ) {
     return this.http.post( 'http://localhost:5000/info_column', {
@@ -61,24 +58,23 @@ export class LoadDatasetService {
     }, this.httpOptions);
   }
 
-  
-
-  public changeColumnToDate( column: string ) {
-    return this.http.post( 'http://localhost:5000/change_column_to_date', {
-      params: {
-        'column': column
-      }
-    }, this.httpOptions);
-  }
-
-
 
   public setSelectedDataset( datasetFile: string ) {
     return sessionStorage.setItem('activeDataset', datasetFile);
   }
 
+  
   public getSelectedDataset() {
     return sessionStorage.getItem('activeDataset');
+  }
+
+
+  public applyOperations( operations: any ) {
+    return this.http.post( 'http://localhost:5000/apply_operations', {
+      params: {
+        'operations': operations
+      }
+    }, this.httpOptions);
   }
 
 

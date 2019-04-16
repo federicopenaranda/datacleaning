@@ -11,34 +11,25 @@ def loadDataset(request):
     start = time.time()
 
     global dataset
+    global datasetFile
 
     data = request.get_json()
 
     if data['params']['dataset'] != None:
         file = r'C:\\courses\\clean01\\datacleaning\\back\\clean01\\public\\datasets\\' + data['params']['dataset']
-        dataset = pd.read_csv(file, error_bad_lines=False, warn_bad_lines=True)
-
-    ram, rows, cols = getOperationMetadata()
+        dataset = pd.read_csv(file)
+        datasetFile = data['params']['dataset']
+    else:
+        return jsonify( result='Wrong Dataset File!' )
 
     end = time.time()
 
-    # print( 'Execution Time: ' )
-    # print( round(end - start, 4) )
+    ram, rows, cols = getOperationMetadata()
 
-    # print( 'RAM Used (MB): ' )
-    # print( ram )
-
-    # print( 'Total Rows: ' )
-    # print( rows )
-
-    # print( 'Total Cols: ' )
-    # print( cols )
-
-    query = "INSERT INTO `operation_log` VALUES (NULL, '" + str( round(end - start, 4) ) + "', '"+ data['params']['dataset'] +"', 'loadDataset', 'finished', '"+ str( ram ) +"', '"+ str( cols ) +"', '"+ str( rows ) +"');"
-    # print (query)
+    query = buildOperationLogQuery( round(end - start, 4), datasetFile, 'load_dataset', '', ram, rows, cols )
     executeQuery(query)
 
-    return ''
+    return jsonify( success=True )
 
 
 def viewDataset(request):
@@ -49,13 +40,6 @@ def viewDataset(request):
         return ''
     else:
         return dataset.head(50).to_json(orient='split', date_format='iso')
-
-
-def deleteColumn(request):
-    global dataset
-    data = request.get_json()
-    dataset.drop(data['params']['column'], axis=1, inplace=True)
-    return dataset.head(50).to_json(orient='split')
 
 
 def infoColumn(request):
@@ -87,22 +71,32 @@ def infoDataset(request):
     return jsonify( info=info, description=description, missing=missing )
 
 
-def changeColumnToDate(request):
+def applyOperations(request):
     global dataset
-    
     data = request.get_json()
-    column = data['params']['column']
-    dataset[column] = pd.to_datetime(dataset[column], format='%Y%m%d', errors='coerce')
-    # sdate = dataset[column]
-    # sdate.dt.strftime("%Y-%m-%d")
-    # dataset['sample_date'] = sdate
 
-    return jsonify( success=True )
+    for col in dataset.columns:
+        if col in data['params']['operations']:
+            for op in data['params']['operations'][col]:
+                applyOperation(op)
 
+    return jsonify( data=data['params'] )
+
+
+def applyOperation(operation):
+    if operation['operation_type'] == 'filling_blank':
+        fillingBlankOperation(operation)
+
+    if operation['operation_type'] == 'change_data_type' and operation['operation_value'] == 'date':
+        changeColumnToDate(operation)
+
+    if operation['operation_type'] == 'delete_column':
+        deleteColumn(operation)
+        
 
 
 #########################################
-##         Helper Functions            ##
+##      START: Helper Functions        ##
 #########################################
 def getOperationMetadata():
     global dataset
@@ -131,11 +125,9 @@ def getOperationMetadata():
     count_row = dataset.shape[0]  # gives number of row count
     count_col = dataset.shape[1]  # gives number of col count    
 
-    return round(memorySize / factor, 4), count_row, count_col
-
+    return str(round(memorySize / factor, 4)), str(count_row), str(count_col)
 
 def executeQuery( sql ):
-    print('executeQuery')
     # MySQL Connection
     import mysql.connector
     from mysql.connector import Error
@@ -155,3 +147,117 @@ def executeQuery( sql ):
             cursor.close()
             connection.close()
             print("MySQL connection is closed")
+
+def buildOperationLogQuery( execution_time, dataset_file, operation_type, operation_configuration, ram, rows, cols ):
+    if operation_configuration == '':
+        return "INSERT INTO `operation_log` \
+                VALUES ( \
+                    NULL, \
+                    '" + str( execution_time ) + "', \
+                    '"+ dataset_file +"', \
+                    '"+ operation_type +"', \
+                    NULL, \
+                    'finished', \
+                    '"+ str( ram ) +"', \
+                    '"+ str( cols ) +"', \
+                    '"+ str( rows ) +"', \
+                    now());"
+    else:
+        return "INSERT INTO `operation_log` \
+                VALUES ( \
+                    NULL, \
+                    '" + str( execution_time ) + "', \
+                    '"+ dataset_file +"', \
+                    '"+ operation_type +"', \
+                    \""+ str(operation_configuration) +"\", \
+                    'finished', \
+                    '"+ str( ram ) +"', \
+                    '"+ str( cols ) +"', \
+                    '"+ str( rows ) +"', \
+                    now());"
+#########################################
+##      START: Helper Functions        ##
+#########################################
+
+
+
+#############################################
+##         Operations Functions            ##
+#############################################
+def fillingBlankOperation( operation ):
+    global dataset
+    global datasetFile
+
+    print(operation)
+
+    if operation['operation_status'] == 'applied':
+        print('operation fillingBlankOperation already applied!')
+        return jsonify( success=True, result='Operation already applied!' )
+
+    if operation['operation_dataset'] == datasetFile:
+        start = time.time()
+        opCol = dataset[operation['operation_column']]
+
+        x = datetime(operation['operation_value']['year'], operation['operation_value']['month'], operation['operation_value']['day'])
+
+        opCol.fillna(x, inplace=True)
+        end = time.time()
+
+        ram, rows, cols = getOperationMetadata()
+
+        query = buildOperationLogQuery( round(end - start, 4), datasetFile, 'filling_blank', operation, ram, rows, cols )
+        executeQuery(query)
+
+        return jsonify( success=True )
+    else:
+        return jsonify( success=False, result='Wrong Dataset File!' )
+
+
+def changeColumnToDate( operation ):
+    global dataset
+    global datasetFile
+
+    if operation['operation_status'] == 'applied':
+        print('operation fillingBlankOperation already applied!')
+        return jsonify( success=True, result='Operation already applied!' )
+
+
+    if operation['operation_dataset'] == datasetFile:
+        start = time.time()
+
+        opCol = dataset[operation['operation_column']]
+        dataset[operation['operation_column']] = pd.to_datetime(opCol, format='%Y%m%d', errors='coerce')
+        
+        end = time.time()
+
+        ram, rows, cols = getOperationMetadata()
+        query = buildOperationLogQuery( round(end - start, 4), datasetFile, 'change_data_type', operation, ram, rows, cols )
+        executeQuery(query)
+                
+        return jsonify( success=True )
+    else:
+        return jsonify( result='Wrong Dataset File or operation!' )
+
+
+def deleteColumn( operation ):
+    global dataset
+    global datasetFile
+
+    if operation['operation_status'] == 'applied':
+        print('operation fillingBlankOperation already applied!')
+        return jsonify( success=True, result='Operation already applied!' )
+
+    if operation['operation_dataset'] == datasetFile:
+        start = time.time()
+
+        dataset.drop( operation['operation_column'], axis=1, inplace=True )
+        
+        end = time.time()
+
+        ram, rows, cols = getOperationMetadata()
+        query = buildOperationLogQuery( round(end - start, 4), datasetFile, 'delete_column', operation, ram, rows, cols )
+        executeQuery(query)
+                
+        return jsonify( success=True )
+    else:
+        return jsonify( result='Wrong Dataset File or operation!' )
