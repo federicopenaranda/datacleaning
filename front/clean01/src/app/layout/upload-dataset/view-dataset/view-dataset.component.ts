@@ -39,7 +39,8 @@ export class ViewDatasetComponent implements OnInit {
 
   public specificDateModal: any;
 
-  public operations: any = {};
+  // public operations: any = {};
+  public operations2: Operation[] = [];
 
   public columnOperationsModal: any;
 
@@ -52,14 +53,14 @@ export class ViewDatasetComponent implements OnInit {
   ngOnInit() {
     this.onViewDataset();
 
-    if ( this.operations.length > 0 )
-    {
-      for (var i=0; i < this.operations.length; i++) {
-        if (this.operations[i].operation_type === 'filling_blank' && this.operations[i].operation_column === this.selectedColumn) {
-          this.specificValue = this.operations[i].operation_value;
-        }
-      }
-    }
+    // if ( this.operations.length > 0 )
+    // {
+    //   for (var i=0; i < this.operations.length; i++) {
+    //     if (this.operations[i].operation_type === 'filling_blank' && this.operations[i].operation_column === this.selectedColumn) {
+    //       this.specificValue = this.operations[i].operation_value;
+    //     }
+    //   }
+    // }
   }
 
 
@@ -79,27 +80,15 @@ export class ViewDatasetComponent implements OnInit {
 
 
   onDeleteColumn() {
-    if ( !this.operations[this.selectedColumn] )
-    {
-      this.operations[this.selectedColumn] = [];
-      let op1 = new Operation('delete_column', this.dataset, this.selectedColumn, this.selectedColumn, 'new');
-      this.operations[this.selectedColumn].push(op1);
-    }
-    else
-    {
-      let flag = false;
-      for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
-        if (this.operations[this.selectedColumn][i].operation_type === 'delete_column') {
-          this.operations[this.selectedColumn][i].operation_value = this.selectedColumn;
-          flag = true;
-        }
-      }
+    let op1 = new Operation('delete_column', this.dataset, this.selectedColumn, this.selectedColumn, this.selectedColumn, 'new');
+    let opRes = this.checkOperation(op1);
 
-      if ( !flag )
-      {
-        let op1 = new Operation('delete_column', this.dataset, this.selectedColumn, this.selectedColumn, 'new');
-        this.operations[this.selectedColumn].push(op1);
-      }
+    if ( !opRes ) {
+      return false;
+    }
+    else {
+      this.operations2.push(op1);
+      return true;
     }
   }
 
@@ -136,17 +125,17 @@ export class ViewDatasetComponent implements OnInit {
     this.selectedColumn = column;
     this.columnOperationsModal = this.modalService.open(columnOperationsModal, { size: 'lg', backdrop: 'static' });
 
-    if ( this.operations[this.selectedColumn] )
-    {
-      for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
-        if (this.operations[this.selectedColumn][i].operation_type === 'filling_blank') {
-          this.specificValue = this.operations[this.selectedColumn][i].operation_value.year + '-' + this.operations[this.selectedColumn][i].operation_value.month + '-' + this.operations[this.selectedColumn][i].operation_value.day;
-          return;
-        }
-      }
-    }
+    // if ( this.operations[this.selectedColumn] )
+    // {
+    //   for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
+    //     if (this.operations[this.selectedColumn][i].operation_type === 'filling_blank') {
+    //       this.specificValue = this.operations[this.selectedColumn][i].operation_value.year + '-' + this.operations[this.selectedColumn][i].operation_value.month + '-' + this.operations[this.selectedColumn][i].operation_value.day;
+    //       return;
+    //     }
+    //   }
+    // }
     
-    this.specificValue = '';
+    // this.specificValue = '';
   }
 
 
@@ -166,44 +155,33 @@ export class ViewDatasetComponent implements OnInit {
 
 
   onChangeToDate() {
-    if ( !this.operations[this.selectedColumn] )
-    {
-      this.operations[this.selectedColumn] = [];
-      let op1 = new Operation('change_data_type', this.dataset, this.selectedColumn, 'date', 'new');
-      this.operations[this.selectedColumn].push(op1);
-    }
-    else
-    {
-      let flag = false;
-      for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
-        if (this.operations[this.selectedColumn][i].operation_type === 'change_data_type') {
-          this.operations[this.selectedColumn][i].operation_value = 'date';
-          flag = true;
-        }
-      }
+    let op1 = new Operation('change_data_type', this.dataset, this.selectedColumn, 'date', 'date', 'new');
+    
+    let opRes = this.checkOperation(op1);
 
-      if ( !flag )
-      {
-        let op1 = new Operation('change_data_type', this.dataset, this.selectedColumn, 'date', 'new');
-        this.operations[this.selectedColumn].push(op1);
-      }
+    if ( !opRes ) {
+      return false;
+    }
+    else {
+      this.operations2.push(op1);
+      return true;
     }
   }
 
 
   onFillSpecificValue(specificValueModal) {
-    if ( this.operations[this.selectedColumn] )
-    {
-      for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
-        if (this.operations[this.selectedColumn][i].operation_type === 'filling_blank') {
-          this.specificValue = this.operations[this.selectedColumn][i].operation_value.year + '-' + this.operations[this.selectedColumn][i].operation_value.month + '-' + this.operations[this.selectedColumn][i].operation_value.day;
-          this.specificDateModal = this.modalService.open(specificValueModal, { size: 'lg', backdrop: 'static' });
-          return;
-        }
-      }
-    }
+    // if ( this.operations[this.selectedColumn] )
+    // {
+    //   for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
+    //     if (this.operations[this.selectedColumn][i].operation_type === 'filling_blank') {
+    //       this.specificValue = this.operations[this.selectedColumn][i].operation_value.year + '-' + this.operations[this.selectedColumn][i].operation_value.month + '-' + this.operations[this.selectedColumn][i].operation_value.day;
+    //       this.specificDateModal = this.modalService.open(specificValueModal, { size: 'lg', backdrop: 'static' });
+    //       return;
+    //     }
+    //   }
+    // }
     
-    this.specificValue = '';
+    // this.specificValue = '';
     this.specificDateModal = this.modalService.open(specificValueModal, { size: 'lg', backdrop: 'static' });
   }
 
@@ -214,33 +192,47 @@ export class ViewDatasetComponent implements OnInit {
 
 
   onSelectSpecificDate(date: any) {
-    if ( !this.operations[this.selectedColumn] )
-    {
-      this.operations[this.selectedColumn] = [];
-      let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, date, 'new');
-      this.operations[this.selectedColumn].push(op1);
-      this.specificValue = date.year + '-' + date.month + '-' + date.day;
-    }
-    else
-    {
-      let flag = false;
-      for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
-        if (this.operations[this.selectedColumn][i].operation_type === 'filling_blank') {
-          this.operations[this.selectedColumn][i].operation_value = date;
-          this.specificValue = date.year + '-' + date.month + '-' + date.day;
-          flag = true;
-        }
-      }
+    let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, date, date.year + '-' + date.month + '-' + date.day, 'new');
+    
+    let opRes = this.checkOperation(op1);
 
-      if ( !flag )
-      {
-        let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, date, 'new');
-        this.operations[this.selectedColumn].push(op1);
-        this.specificValue = date.year + '-' + date.month + '-' + date.day;
-      }
+    if ( !opRes ) {
+      return false;
+    }
+    else {
+      this.operations2.push(op1);
+      return true;
     }
 
-    console.log(this.operations);
+    
+
+
+    // if ( !this.operations[this.selectedColumn] )
+    // {
+    //   this.operations[this.selectedColumn] = [];
+    //   let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, date, 'new');
+    //   this.operations[this.selectedColumn].push(op1);
+    //   this.specificValue = date.year + '-' + date.month + '-' + date.day;
+    // }
+    // else
+    // {
+    //   let flag = false;
+    //   for (var i=0; i < this.operations[this.selectedColumn].length; i++) {
+    //     if (this.operations[this.selectedColumn][i].operation_type === 'filling_blank') {
+    //       this.operations[this.selectedColumn][i].operation_value = date;
+    //       this.specificValue = date.year + '-' + date.month + '-' + date.day;
+    //       flag = true;
+    //     }
+    //   }
+
+    //   if ( !flag )
+    //   {
+    //     let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, date, 'new');
+    //     this.operations[this.selectedColumn].push(op1);
+    //     this.specificValue = date.year + '-' + date.month + '-' + date.day;
+    //   }
+    // }
+
   }
 
 
@@ -249,38 +241,62 @@ export class ViewDatasetComponent implements OnInit {
   }
 
 
-  onApplyOperations() {
-    this.viewDatasetService.applyOperations( this.operations ).subscribe(
-      (data: any) => {
-        for (let col in this.operations) {
-          for ( let i=0; i<this.operations[col].length; i++ )
-          {
-            if ( this.operations[col][i]['operation_status'] == 'new' )
-              this.operations[col][i]['operation_status'] = 'applied';
-          }
-        }
+  onApplyOperations( operation?: Operation ) {
+    // If no operation provided, then apply all operations
+    if ( !operation )
+    {
 
-        this.onViewDataset();
-      },
-      (error) => console.log(error),
-      () => console.log('Operations Applied...')
-    );
+      let newOperations = this.operations2.filter( (op) => {
+        if ( op.operation_status == 'new' )
+          return op;
+      });
+  
+      if ( newOperations.length )
+      {
+        this.viewDatasetService.applyOperations( newOperations ).subscribe(
+          (data: any) => {
+            for ( let i=0; i<this.operations2.length; i++ )
+            {
+              if ( this.operations2[i]['operation_status'] == 'new' )
+                this.operations2[i]['operation_status'] = 'applied';
+            }
+    
+            this.onViewDataset();
+          },
+          (error) => console.log(error),
+          () => console.log('Operations Applied...')
+        );
+      }
+      else
+      {
+        console.log('No new operations found!');
+      }
+
+    }
+    // Single operation to apply provided
+    else
+    {
+      this.viewDatasetService.applyOperations( [ operation ] ).subscribe(
+        (data: any) => {
+          for ( let i=0; i<this.operations2.length; i++ )
+          {
+            if ( this.operations2[i] == operation )
+              this.operations2[i]['operation_status'] = 'applied';
+          }
+  
+          this.onViewDataset();
+        },
+        (error) => console.log(error),
+        () => console.log('Single Operation Applied...')
+      );
+    }
+
+
   }
 
 
   onViewOperations(viewOperationsModal) {
     this.modalService.open(viewOperationsModal, { size: 'lg', backdrop: 'static' });
-    this.buildViewOperations();
-  }
-
-
-  buildViewOperations() {
-    this.viewOperations = [];
-
-    for ( let oo in this.operations )
-    {
-      this.viewOperations.push(...this.operations[oo]);
-    }
   }
 
 
@@ -302,18 +318,32 @@ export class ViewDatasetComponent implements OnInit {
   }
   
   deleteSingleOperation(op) {
-    for ( let oo in this.operations )
+    for ( let i=0; i<this.operations2.length; i++)
     {
-      for ( let i=0; i<this.operations[oo].length; i++)
-      {
-        if ( this.operations[oo][i] == op )
-        {
-          this.operations[oo].splice(i, 1);
-        }
-      }
+      if ( this.operations2[i] == op )
+        this.operations2.splice(i, 1);
     }
+  }
 
-    this.buildViewOperations();
+
+  // Helper: Check if action is already created
+  // checking column and type of operation
+  checkOperation(op1: Operation) : boolean {
+    if ( !this.operations2.length )
+    {
+      return true;
+    }
+    else
+    {
+      for ( let i=0; i<this.operations2.length; i++ )
+      {
+        if ( this.operations2[i].operation_column == op1.operation_column &&
+              this.operations2[i].operation_type == op1.operation_type )
+        return false;
+      }
+
+      return true;
+    }
   }
 
 }

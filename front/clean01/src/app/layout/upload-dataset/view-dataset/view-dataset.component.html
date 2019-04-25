@@ -431,13 +431,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let op of viewOperations">
+                                    <tr *ngFor="let op of operations2">
                                         <td>{{ op.operation_type }}</td>
-                                        <td *ngIf="isDate(op.operation_value)">{{ op.operation_value.year + '-' + op.operation_value.month + '-' + op.operation_value.day }}</td>
-                                        <td *ngIf="!isDate(op.operation_value)">{{ op.operation_value }}</td>
+                                        <td>{{ op.operation_value_view }}</td>
                                         <td>
                                             <button 
-                                                (click)="applySingleOperation(op)"
+                                                (click)="onApplyOperations(op)"
                                                 [disabled]="op.operation_status === 'applied'"
                                                 class="btn btn-sm btn-success" 
                                                 type="button" 

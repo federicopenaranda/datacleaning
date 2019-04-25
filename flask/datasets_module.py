@@ -75,10 +75,15 @@ def applyOperations(request):
     global dataset
     data = request.get_json()
 
-    for col in dataset.columns:
-        if col in data['params']['operations']:
-            for op in data['params']['operations'][col]:
-                applyOperation(op)
+    print(data['params']['operations'])
+
+    for op in data['params']['operations']:
+        applyOperation(op)
+
+    # for col in dataset.columns:
+    #     if col in data['params']['operations']:
+    #         for op in data['params']['operations'][col]:
+    #             applyOperation(op)
 
     return jsonify( data=data['params'] )
 
