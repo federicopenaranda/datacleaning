@@ -22,14 +22,14 @@
         <div class="col col-xl-2 col-lg-2" style="margin-bottom: 1rem">
             <div class="text-right">
                 <div ngbDropdown class="d-inline-block dropdown" placement="bottom-right">
-                    <button class="btn btn-outline-success" ngbDropdownToggle>Operations</button>
-                    <div ngbDropdownMenu>
-                        <!-- [disabled]="isEmpty(operations)"  -->
+                    <button class="btn btn-outline-success" ngbDropdownToggle>Apply Operations</button>
+                    <div ngbDropdownMenu> 
                         <button 
+                            [disabled]="!operations2.length"
                             class="dropdown-item btn btn-outline-success" 
                             (click)="onApplyOperations()">Apply All Operations</button>
-                        <!-- [disabled]="isEmpty(operations)"  -->
                         <button 
+                            [disabled]="!operations2.length"
                             class="dropdown-item btn btn-outline-success" 
                             (click)="onViewOperations(viewOperationsModal)">View Operations</button>
                     </div>
@@ -41,31 +41,38 @@
     <div class="row">
         <div class="col col-xl-12 col-lg-12">
             <div class="card mb-3">
-                <div class="card-header">Dataset</div>
-                <div class="card-body table-responsive">
-                    <table class="table table-sm table-striped">
-                        <thead>
-                            <tr>
-                                <th *ngFor="let c of columns; let i = index">{{ c }}
-                                    <div ngbDropdown class="d-inline-block dropdown">
-                                        <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>
-                                            <i class="fa fa-angle-double-down"></i>
-                                        </button>
-                                        <div ngbDropdownMenu>
-                                            <button class="dropdown-item" (click)="onInfoColumn(columnDescModal, c)">Column Info</button>
-                                            <button class="dropdown-item" (click)="onOtherColumnActions(columnOperationsModal, c)">Other Actions</button>
-                                        </div>
+                <table class="table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>Actions</th>
+                            <th *ngFor="let c of dataColumns; let i = index">{{ c }}
+                                <div ngbDropdown class="d-inline-block dropdown">
+                                    <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>
+                                        <i class="fa fa-angle-double-down"></i>
+                                    </button>
+                                    <div ngbDropdownMenu>
+                                        <button class="dropdown-item" (click)="onInfoColumn(columnDescModal, c)">Column Info</button>
+                                        <button class="dropdown-item" (click)="onOtherColumnActions(columnOperationsModal, c)">Other Actions</button>
                                     </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let i of index">
-                                <td *ngFor="let field of data[i]">{{ field }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let idx of dataIndex; let i = index">
+                            <td>
+                                <button 
+                                    (click)="deleteRow( [idx] )"
+                                    class="btn btn-sm btn-danger" 
+                                    type="button" 
+                                    style="margin-right: 4px">
+                                    <i class="fa fa-trash" alt="Delete Row" ></i>
+                                </button>
+                            </td>
+                            <td *ngFor="let field of data[i]">{{ field }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -74,7 +81,7 @@
 
 <ng-template #columnOperationsModal let-c="close" let-d="dismiss">
     <div class="modal-header">
-        <h4 class="modal-title">Operations on Column: {{ selectedColumn }}</h4>
+        <h4 class="modal-title">Operations on Column: {{ selectedColumn }} ({{ getColumnType(selectedColumn) }})</h4>
         <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -89,7 +96,25 @@
                         <div class="row">
                             <div class="col-sm">
                                 <div class="list-group">
-                                    <a href="javascript:void(0)" class="list-group-item active" (click)="onChangeToDate()">Change column data type to date</a>
+                                    <a *ngIf="getColumnType(selectedColumn) !== 'datetime64[ns]'" 
+                                        href="javascript:void(0)" 
+                                        class="list-group-item active" 
+                                        (click)="onChangeType('datetime64', 'Date')">Change type to date</a>
+
+                                    <a *ngIf="getColumnType(selectedColumn) !== 'float64'" 
+                                        href="javascript:void(0)" 
+                                        class="list-group-item active" 
+                                        (click)="onChangeType('float64', 'Float')">Change type to float</a>
+
+                                    <a *ngIf="getColumnType(selectedColumn) !== 'int64'" 
+                                        href="javascript:void(0)" 
+                                        class="list-group-item active" 
+                                        (click)="onChangeType('int64', 'Integer')">Change type to int</a>
+
+                                    <a *ngIf="getColumnType(selectedColumn) !== 'bool'" 
+                                        href="javascript:void(0)" 
+                                        class="list-group-item active" 
+                                        (click)="onChangeType('bool', 'Boolean')">Change type to bool</a>
                                 </div>
                             </div>
                             <!-- /.col-sm-4 -->
@@ -203,7 +228,7 @@
                                                     </thead>
                                                     <tbody>
                                                         <tr *ngFor="let i of datasetDescription; let i2 = index">
-                                                            <td>{{ columns[i2] }}</td>
+                                                            <td>{{ dataColumns[i2] }}</td>
                                                             <td>{{ i['25%'] }}</td>
                                                             <td>{{ i['50%'] }}</td>
                                                             <td>{{ i['75%'] }}</td>
@@ -238,9 +263,35 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let c of columns">
+                                                        <tr *ngFor="let c of dataColumns">
                                                             <td>{{ c }}</td>
                                                             <td>{{ datasetMissing[c] }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </ngb-tab>
+
+                            <ngb-tab>
+                                <ng-template ngbTabTitle>Data Type Count</ng-template>
+                                <ng-template ngbTabContent>
+                                    <div class="row">
+                                        <div class="col-sm">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Data Type</th>
+                                                            <th>Count</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let dtc of dataTypeCounts">
+                                                            <td>{{ dtc.datatype }}</td>
+                                                            <td>{{ dtc.count }}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -264,7 +315,7 @@
 
 <ng-template #columnDescModal let-c="close" let-d="dismiss">
     <div class="modal-header">
-        <h4 class="modal-title">Column Description: {{ selectedColumn }}</h4>
+        <h4 class="modal-title">Column Description: {{ selectedColumn }} ({{ getColumnType(selectedColumn) }})</h4>
         <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -337,7 +388,7 @@
 
 <ng-template #specificValueModal let-c="close" let-d="dismiss">
     <div class="modal-header">
-        <h4 class="modal-title">Column Description: {{ selectedColumn }}</h4>
+        <h4 class="modal-title">Column Description: {{ selectedColumn }} ({{ getColumnType(selectedColumn) }})</h4>
         <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -348,52 +399,34 @@
                     <div class="col-md-12">
                         <div class="panel-body">
 
-                            <ngb-datepicker (select)="onSelectSpecificDate($event)"></ngb-datepicker>
-                            
-                            <!-- <div class="table-responsive">
-                                <table class="table table-sm table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Description</th>
-                                            <th>Value</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Count</td>
-                                            <td>{{ columnDescription.count }}</td>
-                                        </tr>
-                                        <tr>    
-                                            <td>Max</td>
-                                            <td>{{ columnDescription.max }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Min</td>
-                                            <td>{{ columnDescription.min }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Mean</td>
-                                            <td>{{ columnDescription.mean }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>STD</td>
-                                            <td>{{ columnDescription.std }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>25%</td>
-                                            <td>{{ columnDescription['25%'] }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>50%</td>
-                                            <td>{{ columnDescription['50%'] }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>75%</td>
-                                            <td>{{ columnDescription['75%'] }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div> -->
+                            <ngb-datepicker 
+                                (select)="onSelectSpecificDate($event)" 
+                                *ngIf="getColumnType(selectedColumn) === 'datetime64[ns]'">
+                            </ngb-datepicker>
+
+                            <form *ngIf="getColumnType(selectedColumn) === 'float64'">
+                                <div class="form-group">
+                                    <label for="replaceFloat">Float value to replace:</label>
+                                    <input type="number" name="replaceFloat" [(ngModel)]="replaceFloat" class="form-control" id="replaceFloat" placeholder="Enter float value">
+                                </div>
+                            </form>
+
+                            <form *ngIf="getColumnType(selectedColumn) === 'int64'">
+                                <div class="form-group">
+                                    <label for="replaceInt">Int value to replace:</label>
+                                    <input type="number" name="replaceInt" [(ngModel)]="replaceInt" class="form-control" id="replaceInt" placeholder="Enter int value">
+                                </div>
+                            </form>
+
+                            <form *ngIf="getColumnType(selectedColumn) === 'bool'">
+                                <div class="form-group">
+                                    <label for="replaceBool">Bool value to replace:</label>
+                                    <select class="form-control" [(ngModel)]="replaceBool" name="replaceBool" id="replaceBool">
+                                        <option value="true">True</option>
+                                        <option value="false">False</option>
+                                    </select>
+                                </div>
+                            </form>
 
                         </div>
                     </div>
@@ -437,7 +470,7 @@
                                         <td>
                                             <button 
                                                 (click)="onApplyOperations(op)"
-                                                [disabled]="op.operation_status === 'applied'"
+                                                [disabled]="op.operation_status == 'applied'"
                                                 class="btn btn-sm btn-success" 
                                                 type="button" 
                                                 style="margin-right: 4px">
@@ -445,7 +478,7 @@
                                             </button>
                                             <button 
                                                 (click)="deleteSingleOperation(op)"
-                                                [disabled]="op.operation_status === 'applied'"
+                                                [disabled]="op.operation_status == 'applied'"
                                                 class="btn btn-sm btn-danger" 
                                                 type="button">
                                                 <i class="fa fa-trash" alt="Delete Operation"></i>

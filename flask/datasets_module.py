@@ -2,6 +2,7 @@ import pandas as pd
 from pandas import DataFrame, read_csv
 from flask import jsonify
 from datetime import datetime
+import numpy as np
 import io
 import json
 import time
@@ -36,10 +37,30 @@ def viewDataset(request):
     global dataset
     data = request.get_json()
 
-    if data['params']['dataset'] == None:
+    try:
+        dataset
+    except NameError:
+        print ('Error: Dataset not defined.')
         return ''
     else:
-        return dataset.head(50).to_json(orient='split', date_format='iso')
+        try:
+            data['params']['dataset']
+        except NameError:
+            print ('Error: Dataset not defined.')
+            return ''
+        else:
+            return dataset.to_json(orient='split', date_format='iso')
+        
+
+def viewColumnsTypes():
+    global dataset
+
+    try:
+        dataset
+    except NameError:
+        print ('Error: Dataset not defined.')
+    else:
+        return dataset.dtypes.to_json(orient='split', date_format='iso')
 
 
 def infoColumn(request):
@@ -50,15 +71,13 @@ def infoColumn(request):
     return jsonify( description=desc2 )
 
 
-def infoDataset(request):
+def shapeDataset(request):
     global dataset
 
     # Getting info()
     infoBuffer = io.StringIO()
     dataset.info(verbose=True, buf=infoBuffer)
     info = infoBuffer.getvalue()
-
-    print(info)
 
     # Getting describe()
     describeOutput = dataset.describe(include='all')
@@ -68,14 +87,16 @@ def infoDataset(request):
     missingValuesOutput = dataset.isnull().sum()
     missing = missingValuesOutput.to_json()
 
-    return jsonify( info=info, description=description, missing=missing )
+    # Getting data type count
+    dataTypeCountsOutput = dataset.get_dtype_counts()
+    dataTypeCounts = dataTypeCountsOutput.to_json()
+
+    return jsonify( info=info, description=description, missing=missing, dtcounts=dataTypeCounts )
 
 
 def applyOperations(request):
     global dataset
     data = request.get_json()
-
-    print(data['params']['operations'])
 
     for op in data['params']['operations']:
         applyOperation(op)
@@ -92,8 +113,17 @@ def applyOperation(operation):
     if operation['operation_type'] == 'filling_blank':
         fillingBlankOperation(operation)
 
-    if operation['operation_type'] == 'change_data_type' and operation['operation_value'] == 'date':
+    if operation['operation_type'] == 'change_data_type' and operation['operation_value'] == 'datetime64':
         changeColumnToDate(operation)
+
+    if operation['operation_type'] == 'change_data_type' and operation['operation_value'] == 'float64':
+        changeColumnToFloat(operation)
+
+    if operation['operation_type'] == 'change_data_type' and operation['operation_value'] == 'int64':
+        changeColumnToInt(operation)
+
+    if operation['operation_type'] == 'change_data_type' and operation['operation_value'] == 'bool':
+        changeColumnToBool(operation)
 
     if operation['operation_type'] == 'delete_column':
         deleteColumn(operation)
@@ -193,8 +223,6 @@ def fillingBlankOperation( operation ):
     global dataset
     global datasetFile
 
-    print(operation)
-
     if operation['operation_status'] == 'applied':
         print('operation fillingBlankOperation already applied!')
         return jsonify( success=True, result='Operation already applied!' )
@@ -223,7 +251,7 @@ def changeColumnToDate( operation ):
     global datasetFile
 
     if operation['operation_status'] == 'applied':
-        print('operation fillingBlankOperation already applied!')
+        print('operation changeColumnToDate already applied!')
         return jsonify( success=True, result='Operation already applied!' )
 
 
@@ -242,6 +270,88 @@ def changeColumnToDate( operation ):
         return jsonify( success=True )
     else:
         return jsonify( result='Wrong Dataset File or operation!' )
+
+
+def changeColumnToFloat( operation ):
+    global dataset
+    global datasetFile
+
+    if operation['operation_status'] == 'applied':
+        print('operation changeColumnToFloat already applied!')
+        return jsonify( success=True, result='Operation already applied!' )
+
+
+    if operation['operation_dataset'] == datasetFile:
+        try:
+            start = time.time()
+            opCol = dataset[operation['operation_column']]
+            dataset[operation['operation_column']] = opCol.astype(np.float64)
+        except ValueError:
+            print ('Error: Cannot change column to selected data type.')
+            return jsonify( success=False, result='Error: Cannot change to selected data type.' )
+        else:
+            end = time.time()
+            ram, rows, cols = getOperationMetadata()
+            query = buildOperationLogQuery( round(end - start, 4), datasetFile, 'change_data_type', operation, ram, rows, cols )
+            executeQuery(query)
+            return jsonify( success=True )
+    else:
+        return jsonify( result='Wrong Dataset File or operation!' )
+
+
+def changeColumnToInt( operation ):
+    global dataset
+    global datasetFile
+
+    if operation['operation_status'] == 'applied':
+        print('operation changeColumnToInt already applied!')
+        return jsonify( success=True, result='Operation already applied!' )
+
+
+    if operation['operation_dataset'] == datasetFile:
+        try:
+            start = time.time()
+            opCol = dataset[operation['operation_column']]
+            dataset[operation['operation_column']] = opCol.astype(np.int64)
+        except ValueError:
+            print ('Error: Cannot change column to selected data type.')
+            return jsonify( success=False, result='Error: Cannot change to Int64 data type.' )
+        else:
+            end = time.time()
+            ram, rows, cols = getOperationMetadata()
+            query = buildOperationLogQuery( round(end - start, 4), datasetFile, 'change_data_type', operation, ram, rows, cols )
+            executeQuery(query)
+            return jsonify( success=True )
+    else:
+        return jsonify( result='Wrong Dataset File or operation!' )
+
+
+def changeColumnToBool( operation ):
+    global dataset
+    global datasetFile
+
+    if operation['operation_status'] == 'applied':
+        print('operation changeColumnToBool already applied!')
+        return jsonify( success=True, result='Operation already applied!' )
+
+
+    if operation['operation_dataset'] == datasetFile:
+        try:
+            start = time.time()
+            opCol = dataset[operation['operation_column']]
+            dataset[operation['operation_column']] = opCol.astype(np.bool)
+        except ValueError:
+            print ('Error: Cannot change column to selected data type.')
+            return jsonify( success=False, result='Error: Cannot change to Bool data type.' )
+        else:
+            end = time.time()
+            ram, rows, cols = getOperationMetadata()
+            query = buildOperationLogQuery( round(end - start, 4), datasetFile, 'change_data_type', operation, ram, rows, cols )
+            executeQuery(query)
+            return jsonify( success=True )
+    else:
+        return jsonify( result='Wrong Dataset File or operation!' )
+
 
 
 def deleteColumn( operation ):
@@ -266,3 +376,25 @@ def deleteColumn( operation ):
         return jsonify( success=True )
     else:
         return jsonify( result='Wrong Dataset File or operation!' )
+
+
+def deleteRow( request ):
+    global dataset
+    global datasetFile
+
+    data = request.get_json()
+
+    if len(data['params']['index']) > 0:
+        start = time.time()
+
+        dataset.drop( data['params']['index'], axis=0, inplace=True )
+
+        end = time.time()
+
+        ram, rows, cols = getOperationMetadata()
+        query = buildOperationLogQuery( round(end - start, 4), datasetFile, 'delete_row', data['params']['index'], ram, rows, cols )
+        executeQuery(query)
+                
+        return jsonify( success=True )
+    else:
+        return jsonify( result='No rows to delete!' )

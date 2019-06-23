@@ -78,4 +78,18 @@ export class LoadDatasetService {
   }
 
 
+  public deleteRows( index: Array<number> ) {
+    return this.http.post( 'http://localhost:5000/delete_row', {
+      params: {
+        'index': index
+      }
+    }, this.httpOptions);
+  }
+
+
+  public getColumnsTypes () {
+    return this.http.get( 'http://localhost:5000/columns_types');
+  }
+
+
 }

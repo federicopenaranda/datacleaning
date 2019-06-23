@@ -41,7 +41,7 @@ def info_column():
 
 @app.route('/shape_dataset', methods=['GET'])
 def shape_dataset():
-    return infoDataset(request)
+    return shapeDataset(request)
 
 
 # @app.route('/delete_column', methods=['POST'])
@@ -59,8 +59,16 @@ def apply_operations():
     return applyOperations(request)
 
 
+@app.route('/delete_row', methods=['POST'])
+def delete_row():
+    return deleteRow(request)
+
+
+@app.route('/columns_types', methods=['GET'])
+def columns_types():
+    return viewColumnsTypes()
 
 
 if __name__ == '__main__':
     # run!
-    app.run()
+    app.run( debug=True )

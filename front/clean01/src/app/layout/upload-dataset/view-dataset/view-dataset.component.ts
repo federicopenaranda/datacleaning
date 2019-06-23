@@ -14,9 +14,12 @@ export class ViewDatasetComponent implements OnInit {
 
   public dataset;
 
-  public columns;
-  public index;
-  public data;
+  public dataColumns = [];
+  public dataColumnsTypes = [];
+  public dataIndex = [];
+  public data = [];
+
+  public dataTypeCounts = [];
 
   public selectedColumn: string = '';
 
@@ -46,6 +49,10 @@ export class ViewDatasetComponent implements OnInit {
 
   public viewOperations: Array<any> = [];
 
+  public replaceFloat: number;
+  public replaceInt: number;
+  public replaceBool: boolean;
+
 
   constructor( private viewDatasetService: LoadDatasetService,
                 private modalService: NgbModal ) { }
@@ -69,9 +76,20 @@ export class ViewDatasetComponent implements OnInit {
 
     this.viewDatasetService.viewDataset( this.dataset ).subscribe(
       (data: any) => {
-        this.data = data.data;
-        this.columns = data.columns;
-        this.index = data.index;
+        if ( data )
+        {
+          this.data = data.data;
+          this.dataColumns = data.columns;
+          this.dataIndex = data.index;
+        }
+        else
+        {
+          this.data = [];
+          this.dataColumns = [];
+          this.dataIndex = [];
+        }
+
+        this.getColumnsTypes();
       },
       (error) => console.log(error),
       () => console.log('Load Finished!')
@@ -80,7 +98,7 @@ export class ViewDatasetComponent implements OnInit {
 
 
   onDeleteColumn() {
-    let op1 = new Operation('delete_column', this.dataset, this.selectedColumn, this.selectedColumn, this.selectedColumn, 'new');
+    let op1 = new Operation('delete_column', this.dataset, this.selectedColumn, this.selectedColumn, this.selectedColumn, 'new', '');
     let opRes = this.checkOperation(op1);
 
     if ( !opRes ) {
@@ -98,6 +116,7 @@ export class ViewDatasetComponent implements OnInit {
 
     this.viewDatasetService.shapeDataset().subscribe(
       (data: any) => {
+
         let info = data.info;
         (info).toString();
         info = info.replace("<class 'pandas.core.frame.DataFrame'>\n", '');
@@ -109,11 +128,25 @@ export class ViewDatasetComponent implements OnInit {
         this.datasetMissing = missing;
 
         this.datasetDescription = [];
-        this.columns.forEach(column => {
+        this.dataColumns.forEach(column => {
           this.datasetDescription.push(desc[column]);
         });
 
         this.datasetShape = info;
+
+        // Setting the datatype counts
+        let dtc = JSON.parse(data.dtcounts);
+        let ks = Object.keys(dtc);
+
+        let dtCounts = [];
+
+        ks.map( item => {
+          dtCounts.push( { datatype: item, count: dtc[item] } )
+        });
+
+        this.dataTypeCounts = [];
+        this.dataTypeCounts.push(...dtCounts);
+
       },
       (error) => console.log(error),
       () => console.log('Shape Dataset!')
@@ -154,8 +187,8 @@ export class ViewDatasetComponent implements OnInit {
   }
 
 
-  onChangeToDate() {
-    let op1 = new Operation('change_data_type', this.dataset, this.selectedColumn, 'date', 'date', 'new');
+  onChangeType( newType: string, viewType: string ) {
+    let op1 = new Operation('change_data_type', this.dataset, this.selectedColumn, newType, viewType, 'new', '');
     
     let opRes = this.checkOperation(op1);
 
@@ -186,13 +219,25 @@ export class ViewDatasetComponent implements OnInit {
   }
 
 
-  onSaveSpecificValue(date: any) {
+  onSaveSpecificValue( value: any ) {
+    
+    if ( this.replaceInt )
+      console.log( this.replaceInt );
+    else if ( this.replaceBool )
+      console.log( this.replaceBool );
+    else if ( this.replaceFloat )
+      console.log( this.replaceFloat );
+
+    
+
+    // TODO: create operation
+    
     this.specificDateModal.close();
   }
 
 
   onSelectSpecificDate(date: any) {
-    let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, date, date.year + '-' + date.month + '-' + date.day, 'new');
+    let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, date, date.year + '-' + date.month + '-' + date.day, 'new', '');
     
     let opRes = this.checkOperation(op1);
 
@@ -300,14 +345,6 @@ export class ViewDatasetComponent implements OnInit {
   }
 
 
-  isEmpty(obj) {
-    for(var key in obj) {
-        if(obj.hasOwnProperty(key))
-            return false;
-    }
-    return true;
-  }
-
   isDate(val) {
     return ( val.constructor.name === 'NgbDate' ) ? true : false;
   }
@@ -344,6 +381,43 @@ export class ViewDatasetComponent implements OnInit {
 
       return true;
     }
+  }
+
+
+  deleteRow( index: Array<number> ) {
+    this.viewDatasetService.deleteRows( index ).subscribe(
+      (data) => {
+        this.onViewDataset();
+      },
+      (error) => console.log(error),
+      () => console.log('Delete Rows finished...')
+    );
+  }
+
+
+  getColumnsTypes() {
+    this.viewDatasetService.getColumnsTypes().subscribe(
+      (data: any) => {
+        this.dataColumnsTypes = [];
+
+        for ( let i=0; i<data.index.length; i++ ) {
+          this.dataColumnsTypes.push( { column: data.index[i], type: data.data[i].name } );
+        }
+      },
+      (error) => console.log(error),
+      () => console.log('Column Types Loaded...')
+    );
+  }
+
+
+  getColumnType(selectedColumn) {
+    for ( let i=0; i<this.dataColumnsTypes.length; i++ )
+    {
+      if ( selectedColumn == this.dataColumnsTypes[i].column )
+        return this.dataColumnsTypes[i].type;
+    }
+
+    return 'undefined';
   }
 
 }
