@@ -63,7 +63,7 @@ export class LoadDatasetService {
     return sessionStorage.setItem('activeDataset', datasetFile);
   }
 
-  
+
   public getSelectedDataset() {
     return sessionStorage.getItem('activeDataset');
   }
@@ -89,6 +89,15 @@ export class LoadDatasetService {
 
   public getColumnsTypes () {
     return this.http.get( 'http://localhost:5000/columns_types');
+  }
+
+
+  public getStatisticsColumn ( column: string ) {
+    return this.http.post( 'http://localhost:5000/get_statistics_column', {
+      params: {
+        'column': column
+      }
+    }, this.httpOptions);
   }
 
 

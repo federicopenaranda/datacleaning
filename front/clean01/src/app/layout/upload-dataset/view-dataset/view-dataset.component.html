@@ -134,6 +134,15 @@
                             </div>
                             <!-- /.col-sm-4 -->
                         </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="list-group">
+                                    <a href="javascript:void(0)" class="list-group-item active" (click)="onFillStatistic(specificStatisticModal)">
+                                        Fill with descriptive statistic value <span style="font-weight: bolder"> {{ descriptiveStatistic }}</span></a>
+                                </div>
+                            </div>
+                            <!-- /.col-sm-4 -->
+                        </div>
                     </ng-template>
                 </ngb-tab>
                 <ngb-tab>
@@ -496,6 +505,50 @@
     </div>
     <div class="modal-footer">
         <!-- <button type="button" class="btn btn-primary" (click)="onSaveSpecificValue(d)">Save</button> -->
+        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>
+
+
+<ng-template #specificStatisticModal let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Column Description: {{ selectedColumn }} ({{ getColumnType(selectedColumn) }})</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel-body">
+
+                            <form *ngIf="getColumnType(selectedColumn) === 'float64' || getColumnType(selectedColumn) === 'int64'">
+                                <div class="form-group">
+                                    <label for="replaceFloat">Descriptive Statistic value to replace:</label>
+                                    <div class="form-group">
+                                        <select class="form-control" id="sel1">
+                                          <option>Median</option>
+                                          <option>Mean</option>
+                                          <option>Mode</option>
+                                        </select>
+                                      </div>
+                                </div>
+                            </form>
+
+
+                            <form *ngIf="getColumnType(selectedColumn) !== 'float64' && getColumnType(selectedColumn) !== 'int64'">
+                                <h2>Not the right column type to use this operation.</h2>
+                            </form>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="onSaveStatistic(d)">Save</button>
         <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
     </div>
 </ng-template>

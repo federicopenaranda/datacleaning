@@ -69,6 +69,12 @@ def columns_types():
     return viewColumnsTypes()
 
 
+@app.route('/get_statistics_column', methods=['POST'])
+def get_statistics_column():
+    return getStatisticsColumn(request)
+
+
+
 if __name__ == '__main__':
     # run!
     app.run( debug=True )

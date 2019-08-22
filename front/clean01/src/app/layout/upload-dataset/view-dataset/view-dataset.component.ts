@@ -42,6 +42,11 @@ export class ViewDatasetComponent implements OnInit {
 
   public specificDateModal: any;
 
+
+
+  public descriptiveStatistic: number;
+  public descriptiveStatisticModal: any;
+
   // public operations: any = {};
   public operations2: Operation[] = [];
 
@@ -110,7 +115,7 @@ export class ViewDatasetComponent implements OnInit {
     }
   }
 
-  
+
   onDatasetShape(datasetShapeModal) {
     this.modalService.open(datasetShapeModal, { size: 'lg', backdrop: 'static' });
 
@@ -219,20 +224,60 @@ export class ViewDatasetComponent implements OnInit {
   }
 
 
+  onFillStatistic(statisticValueModal) {
+    this.viewDatasetService.getStatisticsColumn(this.selectedColumn).subscribe(
+      (data: any) => {
+        console.log(data);
+        this.descriptiveStatisticModal = this.modalService.open(statisticValueModal, { size: 'lg', backdrop: 'static' });
+      },
+      (error) => console.log(error),
+      () => console.log('getStatisticsColumn finished...')
+    );
+  }
+
+
   onSaveSpecificValue( value: any ) {
+
+    console.log('onSaveSpecificValue');
+    console.log(value);
+
+    let newValue: any;
     
     if ( this.replaceInt )
-      console.log( this.replaceInt );
+    {
+      newValue = this.replaceInt;
+    }
     else if ( this.replaceBool )
-      console.log( this.replaceBool );
+    {
+      newValue = this.replaceBool;
+    }
     else if ( this.replaceFloat )
-      console.log( this.replaceFloat );
+    {
+      newValue = this.replaceFloat;
+    }
 
-    
 
-    // TODO: create operation
-    
+    let op1 = new Operation('filling_blank', this.dataset, this.selectedColumn, newValue, newValue, 'new', '');
+
+    console.log(op1);
+
     this.specificDateModal.close();
+
+    console.log(this.operations2);
+
+    let opRes = this.checkOperation(op1);
+
+    console.log(opRes);
+
+    if ( !opRes ) {
+      return false;
+    }
+    else {
+      this.operations2.push(op1);
+      return true;
+    }
+    
+
   }
 
 

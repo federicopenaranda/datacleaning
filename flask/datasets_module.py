@@ -210,6 +210,32 @@ def buildOperationLogQuery( execution_time, dataset_file, operation_type, operat
                     '"+ str( cols ) +"', \
                     '"+ str( rows ) +"', \
                     now());"
+
+def getStatisticsColumn(request):
+    global dataset
+
+    data = request.get_json()
+
+    print (data['params']['column'])
+
+    if len(data['params']['column']) > 0:
+        print ( 'Median:' )
+        #print (  dataset[data['params']['column']].median(axis=1, skipna=True)  )
+
+        col = dataset[data['params']['column']]
+
+        median = col.median(skipna=True)
+        mean = col.mean(skipna=True)
+        mode = col.mode(dropna=True)
+
+        print( type(median) )
+        print( type(mean) )
+        print( type(mode[0]) )
+
+        # dataset.drop( data['params']['index'], axis=0, inplace=True )
+        return jsonify( success=True, median=median, mode=mode[0], mean=mean )
+    else:
+        return jsonify( result='No column selected!' )
 #########################################
 ##      START: Helper Functions        ##
 #########################################
@@ -223,6 +249,8 @@ def fillingBlankOperation( operation ):
     global dataset
     global datasetFile
 
+    print( operation )
+
     if operation['operation_status'] == 'applied':
         print('operation fillingBlankOperation already applied!')
         return jsonify( success=True, result='Operation already applied!' )
@@ -231,7 +259,15 @@ def fillingBlankOperation( operation ):
         start = time.time()
         opCol = dataset[operation['operation_column']]
 
-        x = datetime(operation['operation_value']['year'], operation['operation_value']['month'], operation['operation_value']['day'])
+        print ( opCol.dtype )
+
+        if opCol.dtype == 'datetime64[ns]':
+            print ( 'DATETIME type!' )
+            x = datetime(operation['operation_value']['year'], operation['operation_value']['month'], operation['operation_value']['day'])
+
+        if opCol.dtype == 'int64' or opCol.dtype == 'float64' or opCol.dtype == 'object':
+            x = operation['operation_value']
+       
 
         opCol.fillna(x, inplace=True)
         end = time.time()
